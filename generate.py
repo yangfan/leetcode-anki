@@ -49,6 +49,9 @@ def parse_args() -> argparse.Namespace:
         default="",
     )
     parser.add_argument(
+        "--ac", type=bool, help="Choose ac problems only", default=None
+    )
+    parser.add_argument(
         "--output-file", type=str, help="Output filename", default=OUTPUT_FILE
     )
 
@@ -107,7 +110,7 @@ async def generate_anki_note(
 
 
 async def generate(
-    start: int, stop: int, page_size: int, list_id: str, output_file: str
+    start: int, stop: int, page_size: int, list_id: str, ac: bool, output_file: str
 ) -> None:
     """
     Generate an Anki deck
@@ -182,8 +185,12 @@ async def generate(
     note_generators: List[Awaitable[LeetcodeNote]] = []
 
     task_handles = await leetcode_data.all_problems_handles()
+    if ac == True:
+        task_handles = leetcode_data.all_ac_problems_handles(True)
+    elif ac == False:
+        task_handles = leetcode_data.all_ac_problems_handles(False)
 
-    logging.info("Generating flashcards")
+    logging.info(f"Generating {len(task_handles)} flashcards")
     for leetcode_task_handle in task_handles:
         note_generators.append(
             generate_anki_note(leetcode_data, leetcode_model, leetcode_task_handle)
@@ -201,14 +208,15 @@ async def main() -> None:
     """
     args = parse_args()
 
-    start, stop, page_size, list_id, output_file = (
+    start, stop, page_size, list_id, ac, output_file = (
         args.start,
         args.stop,
         args.page_size,
         args.list_id,
+        args.ac,
         args.output_file,
     )
-    await generate(start, stop, page_size, list_id, output_file)
+    await generate(start, stop, page_size, list_id, ac, output_file)
 
 
 if __name__ == "__main__":

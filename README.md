@@ -71,3 +71,8 @@ python generate.py
 ```
 
 You'll get `leetcode.apkg` file, which you can import directly to your anki app.
+
+Option `--ac True` means only ac problems are included; `False` means ac problems are excluded in the database. All problems are included if the option is not used.  
+```sh
+python3 generate.py --output-file all.apkg --ac True
+```

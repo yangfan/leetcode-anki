@@ -273,6 +273,19 @@ class LeetcodeData:
         """
         return list(self._cache.keys())
 
+    def all_ac_problems_handles(self, ac: bool) -> List[str]:
+        """
+        Get all ac problem handles known.
+
+        Example: ["two-sum", "three-sum"]
+        """
+        api_instance = self._api_instance
+        api_response = api_instance.api_problems_topic_get(topic="all")
+        slug_to_solved_status = {pair.stat.question__title_slug: True if pair.status == "ac" else False \
+                                 for pair in api_response.stat_status_pairs}
+        return [slug for slug in self._cache.keys() if slug_to_solved_status[slug]] if ac else \
+            [slug for slug in self._cache.keys() if not slug_to_solved_status[slug]]
+
     def _get_problem_data(
         self, problem_slug: str
     ) -> leetcode.models.graphql_question_detail.GraphqlQuestionDetail:
